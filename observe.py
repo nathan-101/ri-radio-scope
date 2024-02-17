@@ -247,3 +247,32 @@ Your observation's averaged spectrum, dynamic spectrum (waterfall) and Power vs 
     except Exception as e:
         print(e)
         pass
+
+#csv to xml code
+import csv
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
+
+def csv_to_xml(csv_file_path, xml_file_path, root_element_name, record_element_name):
+    with open(csv_file_path, 'r') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        
+        root = ET.Element(root_element_name)
+        
+        for row in csv_reader:
+            record = ET.SubElement(root, record_element_name)
+            for field_name, field_value in row.items():
+                field = ET.SubElement(record, field_name)
+                field.text = field_value
+        
+        xml_data = ET.tostring(root, encoding='utf-8', method='xml')
+        parsed_xml = minidom.parseString(xml_data)
+        
+        with open(xml_file_path, 'w') as xml_file:
+            xml_file.write(parsed_xml.toprettyxml(indent="  "))
+
+# Add this function call where you want to convert CSV to XML
+csv_to_xml('/home/pi/Desktop/pictortelescope/spectrum.csv', '/home/pi/Desktop/pictortelescope/spectrum.xml', 'Spectra', 'Observation')
+
+csv_to_xml('/home/pi/Desktop/pictortelescope/time_series.csv', '/home/pi/Desktop/pictortelescope/time_series.xml', 'TimeSeries', 'DataPoint')
+
